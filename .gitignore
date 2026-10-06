@@ -1,6 +1,11 @@
+.git
+.github
 .env
-data/
-__pycache__/
+.venv
+data
+tests
+scripts
+__pycache__
 *.pyc
-.pytest_cache/
-.venv/
+.pytest_cache
+README.md
