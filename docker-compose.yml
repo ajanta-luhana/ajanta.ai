@@ -2,6 +2,15 @@ services:
   web:
     build: .
     ports: ["8000:8000"]
-    env_file: .env
-    volumes: ["./data:/srv/data", "./knowledge:/srv/knowledge"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_PATH: /srv/data/ajanta.db
+    volumes:
+      - ajanta_data:/srv/data          # named volume: keeps correct ownership for the non-root user
+      - ./knowledge:/srv/knowledge:ro
     restart: unless-stopped
+
+volumes:
+  ajanta_data:
