@@ -1,0 +1,11 @@
+{
+  "about_me.md":   {"title": "About Ajanta", "url": "https://sites.google.com/view/ajantaluhana/home", "updated": "2026-10"},
+  "education.md":  {"title": "Education & Certifications", "url": "https://sites.google.com/view/ajantaluhana/home", "updated": "2026-10"},
+  "experience.md": {"title": "Work Experience", "url": "https://www.linkedin.com/in/ajanta-luhana-b94246264/", "updated": "2026-10"},
+  "skills.md":     {"title": "Skills", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"},
+  "resume.md":     {"title": "Resume", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"},
+  "contact.md":    {"title": "Contact", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"},
+  "quadcopter_uav.md":   {"title": "Lightweight Quadcopter UAV", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"},
+  "visioneye.md":        {"title": "VisionEye", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"},
+  "metavystic_hrmis.md": {"title": "Metavystic HRMIS", "url": "https://github.com/ajanta-luhana/ajanta-portfolio", "updated": "2026-10"}
+}

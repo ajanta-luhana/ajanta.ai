@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06030d">
+<title>Ajanta AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
+:root{--bg:#06030d;--p1:#6d28d9;--p2:#a855f7;--p3:#d8b4fe;--ink:#f3ecff;--mute:#a695c9;--line:rgba(168,85,247,.28);--glass:rgba(22,10,44,.62);--rx:0deg;--ry:0deg}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:radial-gradient(70% 55% at 22% 38%,rgba(109,40,217,.38),transparent 70%),radial-gradient(50% 40% at 90% 100%,rgba(168,85,247,.18),transparent 70%),var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.app{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:1.4rem;padding:1.2rem;max-width:1280px;margin:0 auto}
+button{font:inherit;color:var(--ink);cursor:pointer;border-radius:12px;border:1px solid var(--line);background:rgba(168,85,247,.08);padding:.5rem .9rem;transition:.2s}
+button:hover{border-color:var(--p2);box-shadow:0 0 18px rgba(168,85,247,.35)}
+:focus-visible{outline:2px solid var(--p3);outline-offset:2px}
+/* ---------- 3D avatar stage ---------- */
+.stage{position:relative;perspective:1000px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.floor{position:absolute;left:-25%;right:-25%;bottom:4%;height:34%;background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 26px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/38px 100%;transform:perspective(260px) rotateX(64deg);-webkit-mask-image:linear-gradient(transparent,#000 70%);mask-image:linear-gradient(transparent,#000 70%)}
+.rig{position:relative;width:min(300px,76%);aspect-ratio:1;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .15s ease-out}
+.glow{position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.55),transparent 65%);filter:blur(24px);transform:translateZ(-80px);animation:pulse 4s ease-in-out infinite}
+.ring{position:absolute;inset:-16%;border-radius:50%;border:2px solid transparent;border-top-color:var(--p2);border-left-color:rgba(168,85,247,.3);box-shadow:0 0 22px rgba(168,85,247,.45);animation:spinx 7s linear infinite}
+.ring.r2{inset:-28%;border-top-color:var(--p3);border-right-color:rgba(216,180,254,.25);border-left-color:transparent;animation:spiny 11s linear infinite}
+.ring.r3{inset:-8%;border-width:1px;border-color:rgba(168,85,247,.5);animation:spinx 16s linear infinite reverse}
+@keyframes spinx{from{transform:rotateX(72deg) rotateZ(0)}to{transform:rotateX(72deg) rotateZ(360deg)}}
+@keyframes spiny{from{transform:rotateY(70deg) rotateZ(0)}to{transform:rotateY(70deg) rotateZ(360deg)}}
+@keyframes pulse{50%{opacity:.65;transform:translateZ(-80px) scale(1.08)}}
+.photo{position:absolute;inset:0;border-radius:32px;padding:3px;background:conic-gradient(from var(--a),#6d28d9,#e9d5ff,#2a0a5e,#a855f7,#6d28d9);animation:turn 5s linear infinite,breathe 4.5s ease-in-out infinite;transform:translateZ(46px);box-shadow:0 30px 60px rgba(0,0,0,.65),0 0 50px rgba(168,85,247,.45)}
+@keyframes turn{to{--a:360deg}}@keyframes breathe{50%{scale:1.025}}
+.photo .in{position:relative;width:100%;height:100%;border-radius:29px;overflow:hidden;background:#1a0b33;display:grid;place-items:center;font:700 4rem "Space Grotesk",sans-serif;color:var(--p3)}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.photo .in::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(216,180,254,.28) 50%,transparent 65%);transform:translateX(-120%);animation:sheen 5s ease-in-out infinite}
+.photo .in::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(transparent 55%,rgba(6,3,13,.75))}
+@keyframes sheen{55%,100%{transform:translateX(120%)}}
+.tag{position:absolute;left:50%;bottom:-6%;transform:translate3d(-50%,0,90px);white-space:nowrap;padding:.5rem 1.1rem;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.5);text-align:center}
+.tag b{display:block;font:600 1rem "Space Grotesk",sans-serif}
+.tag span{font-size:.78rem;color:var(--mute);display:flex;align-items:center;gap:.4rem;justify-content:center}
+.tag i{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80}
+.wave{display:flex;gap:5px;height:26px;align-items:flex-end;margin-top:3.2rem;opacity:.35;transition:.3s}
+.wave u{width:5px;height:6px;border-radius:3px;background:linear-gradient(var(--p3),var(--p1));animation:bar 1s ease-in-out infinite;animation-play-state:paused}
+.wave u:nth-child(2){animation-delay:.12s}.wave u:nth-child(3){animation-delay:.24s}.wave u:nth-child(4){animation-delay:.36s}.wave u:nth-child(5){animation-delay:.48s}.wave u:nth-child(6){animation-delay:.6s}.wave u:nth-child(7){animation-delay:.72s}
+@keyframes bar{50%{height:26px}}
+.busy .wave,.speak .wave{opacity:1}.busy .wave u,.speak .wave u{animation-play-state:running}
+.busy .ring,.speak .ring{animation-duration:2.4s}.busy .ring.r2,.speak .ring.r2{animation-duration:3.6s}.busy .glow,.speak .glow{animation-duration:1.2s}
+.busy .tag i{background:var(--p2);box-shadow:0 0 12px var(--p2)}
+/* ---------- chat ---------- */
+.chat{display:flex;flex-direction:column;min-height:0;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:26px;box-shadow:0 40px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07),0 0 60px rgba(109,40,217,.18)}
+.top{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.2rem;border-bottom:1px solid var(--line)}
+.brand{font:700 1.3rem "Space Grotesk",sans-serif}.brand i{font-style:normal;background:linear-gradient(90deg,var(--p2),var(--p3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.top nav{display:flex;gap:.5rem}
+.primary{background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:transparent;font-weight:600;box-shadow:0 8px 22px rgba(109,40,217,.5),inset 0 1px 0 rgba(255,255,255,.3)}
+#log{flex:1;overflow-y:auto;padding:1.2rem}
+.msg{display:flex;gap:.7rem;margin:0 0 1.1rem;max-width:92%;animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.msg.user{margin-left:auto;flex-direction:row-reverse}
+.av{flex:none;width:36px;height:36px;border-radius:12px;overflow:hidden;border:1px solid var(--p2);box-shadow:0 0 14px rgba(168,85,247,.5)}
+.av img{width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.bubble{padding:.7rem 1rem;border-radius:18px;min-width:0;overflow-wrap:anywhere}
+.msg.ai .bubble{background:linear-gradient(160deg,rgba(60,28,110,.6),rgba(20,10,40,.8));border:1px solid var(--line);border-top-left-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08)}
+.msg.user .bubble{background:linear-gradient(135deg,#8b5cf6,#5b21b6);border-top-right-radius:6px;box-shadow:0 10px 24px rgba(91,33,182,.55),inset 0 1px 0 rgba(255,255,255,.3)}
+.bubble p{margin:.3rem 0}.bubble pre{background:#0b0518;border:1px solid var(--line);padding:.7rem;border-radius:10px;overflow-x:auto}.bubble code{font-size:.88em}
+/* typing dots */
+.typing{display:flex;gap:7px;align-items:center;padding:.35rem .2rem}
+.typing b{width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f5e9ff,#a855f7 45%,#4c1d95);box-shadow:0 4px 8px rgba(76,29,149,.8),0 0 12px rgba(168,85,247,.6);animation:hop 1.1s ease-in-out infinite}
+.typing b:nth-child(2){animation-delay:.16s}.typing b:nth-child(3){animation-delay:.32s}
+@keyframes hop{0%,60%,100%{transform:translateY(0) scale(1);opacity:.55}30%{transform:translateY(-9px) scale(1.15);opacity:1}}
+.cards{display:grid;gap:.45rem;margin-top:.7rem}
+.card{border:1px solid var(--line);background:rgba(6,3,13,.55);border-radius:12px;padding:.5rem .7rem;font-size:.83rem}
+.card b{display:block}.card span{color:var(--mute)}.card em{float:right;font-style:normal;color:var(--p3);font-weight:600}.card a{color:var(--p3)}
+.tools{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.55rem}.tools button{font-size:.78rem;padding:.2rem .6rem;border-radius:9px}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.2rem 0 1rem 2.9rem}.chips button{border-radius:999px;font-size:.88rem}
+form.composer{display:flex;gap:.6rem;padding:.9rem 1.1rem;border-top:1px solid var(--line)}
+textarea,input,select{font:inherit;color:var(--ink);background:rgba(6,3,13,.7);border:1px solid var(--line);border-radius:14px;padding:.65rem .9rem;width:100%}
+textarea{resize:none;height:3rem;transition:.2s}textarea:focus{border-color:var(--p2);box-shadow:0 0 22px rgba(168,85,247,.35);outline:none}
+.send{width:52px;padding:0;border-radius:14px}
+dialog{border:1px solid var(--line);border-radius:20px;background:#0f0720;color:var(--ink);max-width:min(480px,92vw);box-shadow:0 0 80px rgba(109,40,217,.4)}
+dialog::backdrop{background:#000a;backdrop-filter:blur(4px)}dialog label{display:block;margin:.6rem 0 .2rem;font-size:.9rem}dialog h2{font-family:"Space Grotesk",sans-serif;margin-top:0}
+.err{color:#fda4af}
+@media(max-width:899px){
+ body{overflow:auto}.app{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto;min-height:100%;padding:.7rem}
+ .stage{height:215px}.rig{width:150px}.wave,.floor{display:none}.tag{bottom:-18%;padding:.3rem .8rem}.tag b{font-size:.9rem}
+ .chat{height:calc(100svh - 280px);min-height:380px;margin-top:1.4rem}.chips{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="app" id="app">
+  <section class="stage" aria-label="Ajanta AI avatar">
+    <div class="floor" aria-hidden="true"></div>
+    <div class="rig" id="rig">
+      <div class="glow"></div><div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="photo"><div class="in" id="ph"><img src="ajanta.jpg" alt="Ajanta Luhana" onerror="this.remove()">AL</div></div>
+      <div class="tag"><b>Ajanta Luhana</b><span><i></i><em id="status" style="font-style:normal">Online</em></span></div>
+    </div>
+    <div class="wave" aria-hidden="true"><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div>
+  </section>
+
+  <section class="chat">
+    <div class="top">
+      <div class="brand">Ajanta <i>AI</i></div>
+      <nav><button id="clear">Clear</button><button id="hireBtn" class="primary">Hire Ajanta</button></nav>
+    </div>
+    <div id="log" aria-live="polite"></div>
+    <form class="composer" id="form">
+      <button type="button" id="mic" aria-label="Speak your question">🎤</button>
+      <textarea id="q" rows="1" maxlength="1000" placeholder="Ask about Ajanta's projects, skills, experience…" aria-label="Your question"></textarea>
+      <button class="primary send" type="submit" aria-label="Send">➤</button>
+    </form>
+  </section>
+</div>
+
+<dialog id="hire"><form method="dialog" id="hireForm">
+  <h2>Hire Ajanta</h2>
+  <label for="h_role">What do you need?</label>
+  <select id="h_role"><option>Full-time AI / LLM engineer role</option><option>Freelance / contract project</option><option>Consulting</option><option>Collaboration</option></select>
+  <label for="h_scope">Project scope</label><textarea id="h_scope" style="height:5rem" required minlength="5"></textarea>
+  <label for="h_skills">Required skills (comma separated)</label><input id="h_skills" placeholder="RAG, LLM agents, Django, YOLO">
+  <label for="h_name">Your name (optional)</label><input id="h_name">
+  <label for="h_email">Your email (optional)</label><input id="h_email" type="email">
+  <div id="h_out" style="margin-top:.8rem"></div>
+  <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem"><button type="button" id="h_close">Close</button><button class="primary" type="submit">Check fit</button></div>
+</form></dialog>
+
+<script>
+const $=s=>document.querySelector(s),log=$("#log"),app=$("#app"),PH=$("#ph");
+const PROMPTS=["Who is Ajanta Luhana?","Where has Ajanta worked?","Tell me about the quadcopter UAV project","What is VisionEye?","Which certifications does Ajanta have?","How does RAG work?"];
+let history=[],last=null,busy=false;
+
+/* 3D tilt follows the pointer; drifts gently on touch */
+const rig=$("#rig");
+addEventListener("pointermove",e=>{if(e.pointerType=="touch")return;const x=e.clientX/innerWidth-.35,y=e.clientY/innerHeight-.5;rig.style.setProperty("--ry",(x*26)+"deg");rig.style.setProperty("--rx",(-y*18)+"deg")},{passive:true});
+
+/* floating purple particles */
+(function(){const c=$("#fx"),g=c.getContext("2d");let W,H,P=[];function size(){W=c.width=innerWidth;H=c.height=innerHeight;P=Array.from({length:Math.min(60,W/22|0)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+.6,v:Math.random()*.35+.1,a:Math.random()*.6+.2}))}
+size();addEventListener("resize",size);if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+(function f(){g.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;if(p.y<-5){p.y=H+5;p.x=Math.random()*W}g.beginPath();g.arc(p.x,p.y,p.r,0,6.3);g.fillStyle=`rgba(192,132,252,${p.a})`;g.shadowBlur=12;g.shadowColor="#a855f7";g.fill()}requestAnimationFrame(f)})()})();
+
+const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function md(t){t=esc(t);t=t.replace(/```(\w*)\n([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c}</code></pre>`).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\*([^*]+)\*/g,"<i>$1</i>");
+  return t.split(/\n{2,}/).map(p=>/^<pre>/.test(p)?p:`<p>${p.replace(/\n/g,"<br>")}</p>`).join("")}
+const avatar='<div class="av"><img src="ajanta.jpg" alt="" onerror="this.parentNode.style.background=\'#3b0764\'"></div>';
+function addMsg(role,html){const d=document.createElement("div");d.className="msg "+role;d.innerHTML=(role=="ai"?avatar:"")+`<div class="bubble">${html}</div>`;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+function state(s){app.classList.toggle("busy",s=="typing");app.classList.toggle("speak",s=="speak");$("#status").textContent=s=="typing"?"Typing…":s=="speak"?"Speaking…":"Online"}
+const DOTS='<div class="typing" aria-label="Ajanta AI is typing"><b></b><b></b><b></b></div>';
+
+function greet(){addMsg("ai","<p>Hi, I'm <b>Ajanta AI</b>, the interactive version of Ajanta Luhana, an AI Software Engineer. Ask me about her experience, projects, certifications or skills. Answers come from verified sources.</p>");
+  const c=document.createElement("div");c.className="chips";c.innerHTML=PROMPTS.map(p=>`<button type="button">${p}</button>`).join("");c.onclick=e=>{if(e.target.tagName=="BUTTON"){c.remove();ask(e.target.textContent)}};log.appendChild(c)}
+$("#clear").onclick=()=>{log.innerHTML="";history=[];speechSynthesis.cancel();state("idle");greet()};
+
+async function ask(text){
+  text=text.trim();if(!text||busy)return;busy=true;last=text;$("#q").value="";document.querySelector(".chips")?.remove();
+  addMsg("user",esc(text));const ai=addMsg("ai",DOTS),b=ai.querySelector(".bubble");state("typing");
+  let acc="",done=null;
+  try{
+    await new Promise(r=>setTimeout(r,650)); /* let the typing dots show, like a real chat */
+    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text,history:history.slice(-8)})});
+    if(!r.ok)throw new Error(r.status==429?"You're sending messages quickly. Wait a minute and try again.":"The assistant is unavailable. Try again shortly.");
+    const rd=r.body.getReader(),dec=new TextDecoder();let buf="";
+    while(true){const{value,done:fin}=await rd.read();if(fin)break;buf+=dec.decode(value,{stream:true});
+      let i;while((i=buf.indexOf("\n\n"))>=0){const line=buf.slice(0,i);buf=buf.slice(i+2);if(!line.startsWith("data: "))continue;const ev=JSON.parse(line.slice(6));
+        if(ev.type=="token"){acc+=ev.text;b.innerHTML=md(acc)}else if(ev.type=="replace"){acc=ev.text;b.innerHTML=md(acc)}else if(ev.type=="done")done=ev;
+        log.scrollTop=log.scrollHeight}}
+    history.push({role:"user",content:text},{role:"assistant",content:acc});finish(ai,b,acc,done);
+  }catch(e){b.innerHTML=`<span class="err">${esc(e.message)}</span>`}
+  busy=false;state("idle")
+}
+function finish(ai,b,acc,done){
+  const seen={},src=(done?.sources||[]).filter(s=>!seen[s.title]&&(seen[s.title]=1));
+  if(src.length)b.insertAdjacentHTML("beforeend",`<div class="cards">${src.map(s=>`<div class="card"><em>${Math.round(s.confidence*100)}%</em><b>${esc(s.title)}</b><span>Verified source · ${esc(s.category)}</span>${s.url?` · <a href="${esc(s.url)}" target="_blank" rel="noopener">open</a>`:""}</div>`).join("")}</div>`);
+  const t=document.createElement("div");t.className="tools";
+  t.innerHTML='<button data-a="copy">Copy</button><button data-a="regen">Regenerate</button><button data-a="up" aria-label="Good answer">👍</button><button data-a="down" aria-label="Bad answer">👎</button><button data-a="speak">🔊 Listen</button>';
+  t.onclick=async e=>{const a=e.target.dataset.a;if(!a)return;
+    if(a=="copy")navigator.clipboard.writeText(acc);
+    if(a=="regen"&&!busy){history.splice(-2);ai.previousElementSibling?.remove();ai.remove();ask(last)}
+    if(a=="up"||a=="down"){await fetch("/api/feedback",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message_id:done.message_id,value:a=="up"?1:-1})});e.target.textContent="Thanks"}
+    if(a=="speak"){if(speechSynthesis.speaking){speechSynthesis.cancel();state("idle");return}const u=new SpeechSynthesisUtterance(acc.replace(/\[S\d+\]|\*/g,""));u.onstart=()=>state("speak");u.onend=u.onerror=()=>state("idle");speechSynthesis.speak(u)}};
+  b.appendChild(t);log.scrollTop=log.scrollHeight}
+
+$("#form").onsubmit=e=>{e.preventDefault();ask($("#q").value)};
+$("#q").onkeydown=e=>{if(e.key=="Enter"&&!e.shiftKey){e.preventDefault();ask(e.target.value)}};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR)$("#mic").hidden=true;else $("#mic").onclick=()=>{const r=new SR();r.lang="en-US";r.onresult=e=>ask(e.results[0][0].transcript);r.onerror=()=>{};r.start()};
+
+const hire=$("#hire");$("#hireBtn").onclick=()=>hire.showModal();$("#h_close").onclick=()=>hire.close();
+$("#hireForm").onsubmit=async e=>{e.preventDefault();const out=$("#h_out");out.textContent="Checking…";
+  try{const r=await fetch("/api/hire",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({role_type:$("#h_role").value,scope:$("#h_scope").value,skills:$("#h_skills").value.split(",").map(s=>s.trim()).filter(Boolean),name:$("#h_name").value,email:$("#h_email").value})});
+    if(!r.ok)throw 0;const d=await r.json(),u={};
+    out.innerHTML=`<p>${esc(d.summary)}</p>`+d.projects.filter(p=>!u[p.title]&&(u[p.title]=1)).map(p=>`<div class="card"><b>${esc(p.title)}</b><span>Matched: ${esc(p.matched.join(", "))}</span></div>`).join("")}
+  catch{out.innerHTML='<span class="err">Could not submit. Check the fields and try again.</span>'}};
+greet();
+</script>
+</body>
+</html>
