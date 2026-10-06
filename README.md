@@ -1,44 +1,101 @@
-# Ajanta AI
+Ajanta AI
 
-Ajanta AI is a production-ready personal AI assistant built with Python, RAG, vector search and LLM orchestration. It provides an interactive representation of Ajanta Luhana's professional profile, projects, technical skills and AI engineering knowledge, using retrieval-grounded generation, source citations and hallucination safeguards, with a recruiter-focused Hire Ajanta workflow and analytics.
+An interactive AI assistant that represents Ajanta Luhana, an AI Software Engineer. Visitors can ask about her experience, projects, certifications and skills, and get answers grounded in a verified knowledge base, with source citations. Built with Python, FastAPI and retrieval-augmented generation (RAG).
 
-## Run it
+Live demo: add your Render link here
 
-```bash
-python -m venv .venv && source .venv/bin/activate
+Show Image Add a screenshot at docs/screenshot.png.
+
+Features
+Chat UI with a 3D animated avatar, typing indicator and streamed answers
+RAG pipeline: intent detection, BM25 retrieval, relevance threshold
+Source citations on every personal answer
+Hallucination guardrails: unsupported questions get a "not verified" reply, and prompt-injection attempts are refused
+Optional LLM (any OpenAI-compatible API). Without a key, answers are extracted directly from the sources
+Hire Ajanta form that matches a requirement against her verified skills and projects
+Feedback buttons (thumbs up/down), copy, regenerate, voice input and read-aloud (browser Web Speech API)
+Admin API: analytics, flagged answers, anonymized CSV export, re-index (protected by a token)
+Rate limiting, input validation, Docker, GitHub Actions CI, automated tests
+How it works
+question
+  -> intent detection (profile, experience, projects, skills, technical, ...)
+  -> BM25 retrieval over knowledge/*.md (filtered by intent)
+  -> relevance threshold (below it: "not verified" reply)
+  -> LLM answer using only the retrieved sources (or extractive answer without a key)
+  -> grounding check (personal answers must cite valid [S#] sources)
+  -> streamed to the UI with source cards
+
+If the grounding check fails, the answer is replaced with the fallback message and flagged in the admin analytics.
+
+Project structure
+app/
+  api/        chat, hire, admin routes
+  core/       config, security (rate limit, admin auth), logging
+  llm/        prompts, guardrails, LLM provider
+  rag/        chunking, ingestion, retriever
+  services/   chat pipeline, hire matching, analytics
+  models/     schemas, SQLite database
+knowledge/    personal/, projects/, technical/ Markdown + metadata/sources.json
+frontend/     index.html (chat UI), ajanta.jpg, privacy.html
+scripts/      ingest.py (check the index), build_demo.py (static demo page)
+tests/        pytest suite
+Run locally
+
+Requires Python 3.11+.
+
+Windows (PowerShell)
+
+powershell
 pip install -r requirements.txt
-cp .env.example .env          # set ADMIN_TOKEN (and OPENAI_API_KEY if you want LLM answers)
-uvicorn app.main:app --reload # open http://localhost:8000
-pytest -q
-```
+$env:ADMIN_TOKEN = "test"
+python -m uvicorn app.main:app
 
-Docker: `docker compose up --build`.
+Mac / Linux
 
-## Knowledge base
+bash
+pip install -r requirements.txt
+ADMIN_TOKEN=test python -m uvicorn app.main:app
 
-`knowledge/` is filled from the content of the portfolio at github.com/ajanta-luhana/ajanta-portfolio (experience, education, certifications, skills, projects, contact). Nothing else is assumed. To change an answer, edit the Markdown file and run `python -m scripts.ingest` (or `POST /api/admin/reindex`). Lines containing `TODO` are ignored at indexing.
+Open http://localhost:8000. Run the tests with pytest -q.
 
-Keep the portfolio and this folder in sync, since the portfolio is the source of truth.
+Docker: docker compose up --build
 
-## How it works
+Configuration
 
-Intent detection → BM25 retrieval with intent-based filtering → relevance threshold → LLM answer (or extractive answer if no API key) → grounding validation (personal answers must carry valid `[S#]` citations) → streamed to the UI with source cards. Failed grounding falls back to the "not verified" message and is flagged in the admin dashboard.
+Copy .env.example to .env.
 
-## Endpoints
+Variable	Purpose
+ADMIN_TOKEN	Bearer token for /api/admin/* (required for admin routes)
+OPENAI_API_KEY	Optional. Enables LLM-written answers
+OPENAI_MODEL, OPENAI_BASE_URL	Model and endpoint for any OpenAI-compatible API
+CONTACT_EMAIL	Shown in fallback answers
+ALLOWED_ORIGINS	CORS origins, set to your public URL
+RATE_LIMIT_PER_MIN	Per-IP request limit (default 20)
+DATABASE_PATH	SQLite file (default data/ajanta.db)
+Updating the knowledge base
 
-`POST /api/chat` (SSE) · `POST /api/feedback` · `POST /api/hire` · `GET /api/health` · `GET /api/sources/{id}` · admin (Bearer `ADMIN_TOKEN`): `GET /api/admin/analytics`, `GET /api/admin/export`, `POST /api/admin/reindex`
+All answers come from the Markdown files in knowledge/. Edit a file, then run python -m scripts.ingest to check the index, or call POST /api/admin/reindex on a running server. Lines containing TODO are ignored.
 
-## Status against the requirements
+API
+Endpoint	Description
+POST /api/chat	Streamed (SSE) chat answer with sources
+POST /api/feedback	Thumbs up/down for an answer
+POST /api/hire	Match a requirement against verified skills and projects
+GET /api/health	Health check
+GET /api/sources/{id}	Source metadata
+GET /api/admin/analytics	Usage, flagged answers, feedback (Bearer token)
+GET /api/admin/export	Anonymized CSV (Bearer token)
+POST /api/admin/reindex	Rebuild the index (Bearer token)
+Deploy (Render)
+Build command: pip install -r requirements.txt
+Start command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Health check path: /api/health
+Set ADMIN_TOKEN, CONTACT_EMAIL, ALLOWED_ORIGINS (and optionally OPENAI_API_KEY)
+Limitations and roadmap
+Retrieval is keyword-based (BM25). Semantic search with embeddings and a vector database (pgvector or Chroma) is the next step, and the retriever is isolated behind a search() method so it can be swapped in app/rag/retriever.py.
+Data is stored in SQLite. On hosts with an ephemeral disk, analytics reset on redeploy. Move to PostgreSQL for persistence.
+Not built yet: server-side speech-to-text and text-to-speech, email delivery for hire requests, reranking, an evaluation set, and observability tooling.
+The avatar is an animated photo, not a lip-synced video.
+Author
 
-| Area | Status |
-|---|---|
-| MVP (chat UI, FastAPI, RAG, citations, fallback, Hire flow, Docker, CI) | Done |
-| Technical KB, admin analytics, feedback, hire matching, rate limiting, voice (browser-side) | Done |
-| Pgvector / ChromaDB + embeddings | Not yet. Retriever is BM25 behind a `search()` interface; swap it in `app/rag/retriever.py` |
-| PostgreSQL | Not yet. SQLite for now (`app/models/database.py`) |
-| Server-side STT/TTS, email delivery, LangGraph, reranker, Langfuse | Phase 2 |
-| 60-question evaluation set | Not yet. `tests/` has the unit and behaviour tests to extend |
-
-## Deploy
-
-Push to GitHub, connect Render/Railway, set the env vars from `.env.example`, mount a persistent disk at `/srv/data`. HTTPS is provided by the host. Set `ALLOWED_ORIGINS` to your public URL.
+Ajanta Luhana. Email: ajantaluhana@gmail.com. LinkedIn. GitHub.
